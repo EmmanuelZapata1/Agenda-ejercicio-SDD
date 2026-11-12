@@ -19,15 +19,17 @@
     <span class="aurora-glow glow-3"></span>
   </div>
 
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <a class="skip-link" href="#view">Saltar al contenido</a>
 
   <div class="app-shell">
     <!-- ───────── Navegación lateral (fija 240px en escritorio) ───────── -->
     <aside class="sidebar" aria-label="Navegación principal">
       <div class="sidebar-brand">
-        <span class="brand-badge">✦ Taller &amp; Registro · 1912</span>
-        <span class="brand-title">Cronos &amp; Co.</span>
-        <span class="brand-subtitle">Gestor de tareas y compromisos</span>
+        <a class="brand-home" href="#/inicio">
+          <span class="brand-badge">✦ Taller &amp; Registro · 1912</span>
+          <span class="brand-title">Cronos &amp; Co.</span>
+          <span class="brand-subtitle">Gestor de tareas y compromisos</span>
+        </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar-panel">
           <span class="menu-toggle-bars" aria-hidden="true"></span>
           <span class="menu-toggle-label">Menú</span>
@@ -35,12 +37,17 @@
       </div>
 
       <div class="sidebar-panel" id="sidebar-panel">
-        <nav class="sidebar-nav">
-          <span class="sidebar-heading">Cuaderno</span>
-          <a class="nav-link is-active" href="#panel"><span class="nav-glyph" aria-hidden="true">❦</span>Panel general</a>
-          <a class="nav-link" href="#tareas"><span class="nav-glyph" aria-hidden="true">✍&#xFE0E;</span>Tareas<span class="nav-count" id="nav-count-tasks">0</span></a>
-          <a class="nav-link" href="#compromisos"><span class="nav-glyph" aria-hidden="true">❖</span>Compromisos<span class="nav-count" id="nav-count-comm">0</span></a>
-          <a class="nav-link" href="#alta"><span class="nav-glyph" aria-hidden="true">✦</span>Nueva entrada</a>
+        <nav class="sidebar-nav" aria-label="Secciones">
+          <span class="sidebar-heading">Ver</span>
+          <a class="nav-link" href="#/inicio" data-route="inicio"><span class="nav-glyph" aria-hidden="true">❦</span>Inicio</a>
+          <a class="nav-link" href="#/tareas" data-route="tareas"><span class="nav-glyph" aria-hidden="true">✍&#xFE0E;</span>Tareas<span class="nav-count" id="nav-count-tasks">0</span></a>
+          <a class="nav-link" href="#/compromisos" data-route="compromisos"><span class="nav-glyph" aria-hidden="true">❖</span>Compromisos<span class="nav-count" id="nav-count-comm">0</span></a>
+        </nav>
+
+        <nav class="sidebar-nav" aria-label="Registrar">
+          <span class="sidebar-heading">Registrar</span>
+          <a class="nav-link nav-link-action" href="#/nueva-tarea" data-route="nueva-tarea"><span class="nav-glyph" aria-hidden="true">+</span>Nueva tarea</a>
+          <a class="nav-link nav-link-action" href="#/nuevo-compromiso" data-route="nuevo-compromiso"><span class="nav-glyph" aria-hidden="true">+</span>Nuevo compromiso</a>
         </nav>
 
         <section class="sidebar-ledger" aria-label="Resumen del registro">
@@ -59,57 +66,11 @@
         </div>
       </div>
     </aside>
+    <div class="sidebar-scrim" aria-hidden="true"></div>
 
-    <!-- ───────── Lienzo de trabajo ───────── -->
-    <main class="workspace" id="contenido">
-      <header class="page-header" id="panel">
-        <p class="page-eyebrow" id="today-label">Edición del día</p>
-        <h1 class="page-title">Cuaderno de Tareas &amp; Compromisos</h1>
-        <p class="page-subtitle">Registro riguroso de pendientes, plazos y encuentros acordados.</p>
-        <div class="ornament-rule" aria-hidden="true"><span>✦</span></div>
-      </header>
-
-      <div class="search-bar" role="search">
-        <label class="search-label" for="search-input">Buscar en el cuaderno</label>
-        <div class="search-field">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <input id="search-input" class="search-input" type="search" autocomplete="off" placeholder="Título, etiqueta, lugar o correo…" aria-describedby="search-hint" />
-          <button id="search-clear" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>✕</button>
-          <kbd class="search-kbd" id="search-hint" title="Atajo de teclado">/</kbd>
-        </div>
-      </div>
-
-      <div id="alert-zone" class="alert-zone"></div>
-
-      <div class="twin-columns">
-        <section class="column-section" id="tareas" aria-labelledby="heading-tasks">
-          <div class="section-header">
-            <h2 class="section-title" id="heading-tasks"><span class="section-glyph" aria-hidden="true">✍&#xFE0E;</span>Tareas</h2>
-            <span class="section-counter" id="counter-tasks">0 tareas</span>
-          </div>
-          <div class="filter-bar" role="group" aria-label="Filtrar tareas por estado" id="filter-task-status"></div>
-          <div class="filter-bar filter-bar-sub" role="group" aria-label="Filtrar tareas por prioridad" id="filter-task-priority"></div>
-          <div class="card-list" id="tasks-container" aria-live="polite"></div>
-        </section>
-
-        <section class="column-section" id="compromisos" aria-labelledby="heading-comm">
-          <div class="section-header">
-            <h2 class="section-title" id="heading-comm"><span class="section-glyph" aria-hidden="true">❖</span>Compromisos</h2>
-            <span class="section-counter" id="counter-comm">0 compromisos</span>
-          </div>
-          <div class="filter-bar" role="group" aria-label="Filtrar compromisos por estado" id="filter-comm-status"></div>
-          <div class="card-list" id="commitments-container" aria-live="polite"></div>
-        </section>
-      </div>
-
-      <section class="official-form-section" id="alta" aria-labelledby="heading-form">
-        <div class="ornament-rule" aria-hidden="true"><span>❦</span></div>
-        <div class="form-section-head">
-          <h2 class="section-title" id="heading-form">Formulario Oficial de Alta</h2>
-          <p class="form-section-sub">Las reglas de negocio se validan mientras escribes.</p>
-        </div>
-        <div id="form-mount-point"></div>
-      </section>
+    <!-- ───────── Lienzo de trabajo: aquí se pinta cada página ───────── -->
+    <main class="workspace">
+      <div id="view" class="view" tabindex="-1"></div>
 
       <footer class="cronos-footer">
         <div class="footer-ornament" aria-hidden="true">❦ &nbsp; ❖ &nbsp; ❦</div>
@@ -118,6 +79,8 @@
       </footer>
     </main>
   </div>
+
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
 
   <script type="module" src="/src/main.ts"></script>
 </body>

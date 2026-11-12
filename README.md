@@ -25,13 +25,24 @@ npm run build    # verificación de tipos + build de producción en dist/
 ## Reglas de negocio cubiertas
 
 - **RN-01** — La fecha de vencimiento de una tarea no puede estar en el pasado.
-- **RN-02** — `COMPLETADA` y `CANCELADA` son estados terminales (la UI deshabilita las transiciones inválidas).
+- **RN-02** — `COMPLETADA` y `CANCELADA` son estados terminales (cada tarjeta solo ofrece las acciones válidas).
 - **RN-03** — Sin solapamiento de compromisos `PROGRAMADO`/`CONFIRMADO` para el mismo creador.
 - **RN-04** — Duración mínima de 15 minutos (insignia "Intervalo verificado" en vivo).
 - **RN-05** — Participantes con formato RFC 5322; el creador se incluye siempre.
 
 ## Interfaz
 
-- Escritorio (> 1025 px): navegación lateral fija de 240 px, columnas gemelas de Tareas y Compromisos y formulario oficial de alta al pie.
-- Tablet (641–1024 px): barra superior colapsable y rejilla de 2 columnas.
-- Móvil (< 640 px): una sola columna, filtros con scroll horizontal táctil y formulario apilado.
+La app está organizada en páginas separadas (enrutamiento por `#/ruta`, funcionan los botones Atrás/Adelante):
+
+| Página | Ruta | Para qué sirve |
+| :--- | :--- | :--- |
+| Inicio | `#/inicio` | Resumen: pendientes, en proceso, vencidas y próximos compromisos |
+| Tareas | `#/tareas` | Lista con buscador, filtros por estado y prioridad, y acciones Iniciar / Completar / Cancelar |
+| Compromisos | `#/compromisos` | Lista con buscador, filtro por estado y acciones Confirmar / Cancelar |
+| Nueva tarea | `#/nueva-tarea` | Formulario de alta de tareas |
+| Nuevo compromiso | `#/nuevo-compromiso` | Formulario de alta con aviso en vivo de duración y cruces de horario |
+
+- Escritorio (> 1025 px): navegación lateral fija de 240 px.
+- Tablet (641–1024 px): barra superior con botón «Menú» y rejilla de 2 columnas.
+- Móvil (< 640 px): una sola columna, filtros con scroll horizontal táctil y formularios apilados.
+- Los avisos de éxito o error aparecen flotando abajo a la derecha, siempre a la vista; los errores de un formulario también se muestran junto al botón Guardar.
