@@ -8,6 +8,7 @@ import { renderCommitmentCard, COMMITMENT_STATUS_LABEL } from './ui/components/c
 import { renderOfficialForm } from './ui/components/official-form';
 import { renderAlertBanner } from './ui/components/alert-banner';
 import { clear, el } from './ui/dom';
+import { matchesQuery } from './ui/format';
 import { CommitmentStatus, Priority, TaskStatus } from './domain/types';
 
 /* ───────────────────────── Composición de capas ───────────────────────── */
@@ -23,6 +24,7 @@ const view = {
   taskStatus: 'TODAS' as TaskFilter,
   taskPriority: 'TODAS' as PriorityFilter,
   commStatus: 'TODOS' as CommFilter,
+  query: '',
 };
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -162,7 +164,8 @@ function refreshUI(): void {
     const statusOk = view.taskStatus === 'TODAS'
       || (view.taskStatus === 'VENCIDAS' ? t.isPendingAndOverdue(now) : t.estado === view.taskStatus);
     const prioOk = view.taskPriority === 'TODAS' || t.prioridad === view.taskPriority;
-    return statusOk && prioOk;
+    const textOk = matchesQuery([t.titulo, t.descripcion, ...t.etiquetas], view.query);
+    return statusOk && prioOk && textOk;
   });
 
   $('counter-tasks').textContent = visibleTasks.length === tasks.length
@@ -174,7 +177,7 @@ function refreshUI(): void {
   if (visibleTasks.length === 0) {
     tasksContainer.appendChild(tasks.length === 0
       ? emptyState('✍\uFE0E', 'Aún no hay tareas en el cuaderno.', 'Registra la primera desde el formulario oficial de alta.')
-      : emptyState('✦', 'Ninguna tarea coincide con el filtro.', 'Prueba con otro estado o prioridad.'));
+      : emptyState('✦', 'Ninguna tarea coincide con la búsqueda o el filtro.', 'Prueba con otro texto, estado o prioridad.'));
   } else {
     visibleTasks.forEach(task => tasksContainer.appendChild(renderTaskCard(task, {
       onStatusChange: (id, newStatus) => {
@@ -205,7 +208,9 @@ function refreshUI(): void {
     })),
   ], view.commStatus, v => { view.commStatus = v; refreshUI(); });
 
-  const visibleComm = commitments.filter(c => view.commStatus === 'TODOS' || c.estado === view.commStatus);
+  const visibleComm = commitments.filter(c =>
+    (view.commStatus === 'TODOS' || c.estado === view.commStatus)
+    && matchesQuery([c.titulo, c.descripcion, c.ubicacion, ...c.participantes], view.query));
   $('counter-comm').textContent = visibleComm.length === commitments.length
     ? `${commitments.length} ${commitments.length === 1 ? 'compromiso' : 'compromisos'}`
     : `${visibleComm.length} de ${commitments.length}`;
@@ -215,7 +220,7 @@ function refreshUI(): void {
   if (visibleComm.length === 0) {
     commContainer.appendChild(commitments.length === 0
       ? emptyState('❖', 'No hay compromisos agendados.', 'Agenda uno desde el formulario oficial de alta.')
-      : emptyState('✦', 'Ningún compromiso coincide con el filtro.', 'Prueba con otro estado.'));
+      : emptyState('✦', 'Ningún compromiso coincide con la búsqueda o el filtro.', 'Prueba con otro texto o estado.'));
   } else {
     visibleComm.forEach(comm => commContainer.appendChild(renderCommitmentCard(comm, {
       onConfirm: (id) => {
@@ -288,6 +293,35 @@ function setupNavigation(form: { showTab: (t: 'task' | 'commitment') => void }):
   $('today-label').textContent = `Edición del ${today}`;
 }
 
+/* ───────────────────────── Buscador ───────────────────────── */
+function setupSearch(): void {
+  const input = $('search-input') as HTMLInputElement;
+  const clearBtn = $('search-clear') as HTMLButtonElement;
+  let debounce: number | undefined;
+
+  const apply = () => {
+    view.query = input.value;
+    clearBtn.hidden = input.value.length === 0;
+    refreshUI();
+  };
+
+  input.addEventListener('input', () => {
+    window.clearTimeout(debounce);
+    debounce = window.setTimeout(apply, 120);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && input.value) { input.value = ''; apply(); }
+  });
+  clearBtn.addEventListener('click', () => { input.value = ''; apply(); input.focus(); });
+
+  // Atajo "/" para enfocar el buscador (salvo si ya se escribe en un campo).
+  document.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement;
+    const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+    if (e.key === '/' && !typing) { e.preventDefault(); input.focus(); }
+  });
+}
+
 /* ───────────────────────── Arranque ───────────────────────── */
 function initApp(): void {
   try {
@@ -323,6 +357,7 @@ function initApp(): void {
 
   $('form-mount-point').appendChild(form.element);
   setupNavigation(form);
+  setupSearch();
   refreshUI();
 
   // Reevalúa vencimientos cada minuto sin recargar.

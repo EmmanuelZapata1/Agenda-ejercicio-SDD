@@ -76,3 +76,19 @@ export function splitEmails(raw: string): string[] {
 export function invalidEmails(emails: string[]): string[] {
   return emails.filter(e => !validateEmailRfc5322(e));
 }
+
+/** Normaliza texto para búsqueda: minúsculas y sin tildes (é → e, ñ → n). */
+export function normalizeForSearch(text: string): string {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+/**
+ * Indica si algún campo contiene todas las palabras de la consulta,
+ * sin distinguir mayúsculas ni tildes. Una consulta vacía coincide con todo.
+ */
+export function matchesQuery(fields: string[], query: string): boolean {
+  const words = normalizeForSearch(query).split(/\s+/).filter(Boolean);
+  if (words.length === 0) return true;
+  const haystack = normalizeForSearch(fields.join(' '));
+  return words.every(w => haystack.includes(w));
+}

@@ -69,6 +69,16 @@
         <div class="ornament-rule" aria-hidden="true"><span>✦</span></div>
       </header>
 
+      <div class="search-bar" role="search">
+        <label class="search-label" for="search-input">Buscar en el cuaderno</label>
+        <div class="search-field">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input id="search-input" class="search-input" type="search" autocomplete="off" placeholder="Título, etiqueta, lugar o correo…" aria-describedby="search-hint" />
+          <button id="search-clear" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>✕</button>
+          <kbd class="search-kbd" id="search-hint" title="Atajo de teclado">/</kbd>
+        </div>
+      </div>
+
       <div id="alert-zone" class="alert-zone"></div>
 
       <div class="twin-columns">

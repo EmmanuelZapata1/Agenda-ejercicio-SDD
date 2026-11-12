@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkInterval, formatDuration, invalidEmails, shortId, splitEmails, toLocalInputValue } from '../src/ui/format';
+import { checkInterval, formatDuration, invalidEmails, matchesQuery, normalizeForSearch, shortId, splitEmails, toLocalInputValue } from '../src/ui/format';
 
 describe('Utilidades de presentación (UI)', () => {
   it('formatDuration produce el formato Xh Ym del design system', () => {
@@ -29,5 +29,22 @@ describe('Utilidades de presentación (UI)', () => {
   it('shortId y toLocalInputValue', () => {
     expect(shortId('12345678-aaaa-bbbb-cccc-1234567890ab')).toBe('12345678');
     expect(toLocalInputValue(new Date(2030, 0, 5, 9, 7))).toBe('2030-01-05T09:07');
+  });
+});
+
+describe('Buscador del cuaderno', () => {
+  it('normaliza mayúsculas y tildes', () => {
+    expect(normalizeForSearch('  Composición TIPOGRÁFICA ')).toBe('composicion tipografica');
+  });
+
+  it('coincide sin importar tildes, mayúsculas ni orden de palabras', () => {
+    const campos = ['Auditoría de tintas', 'Revisión en taller', 'Calidad'];
+    expect(matchesQuery(campos, 'auditoria')).toBe(true);
+    expect(matchesQuery(campos, 'CALIDAD tintas')).toBe(true);
+    expect(matchesQuery(campos, 'tintas inventario')).toBe(false);
+  });
+
+  it('una búsqueda vacía muestra todo', () => {
+    expect(matchesQuery(['cualquier cosa'], '   ')).toBe(true);
   });
 });
