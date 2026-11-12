@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cronos &amp; Co. — Gestor de Tareas y Compromisos</title>
+  <meta name="description" content="Cuaderno editorial de tareas y agenda de compromisos. Implementación del SDD con el sistema de diseño Cronos & Co." />
+  <meta name="theme-color" content="#112109" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23112109'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23d5e261'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Atmósfera Aurora: veladuras difusas con desenfoque gaussiano -->
+  <div class="aurora" aria-hidden="true">
+    <span class="aurora-glow glow-1"></span>
+    <span class="aurora-glow glow-2"></span>
+    <span class="aurora-glow glow-3"></span>
+  </div>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <div class="app-shell">
+    <!-- ───────── Navegación lateral (fija 240px en escritorio) ───────── -->
+    <aside class="sidebar" aria-label="Navegación principal">
+      <div class="sidebar-brand">
+        <span class="brand-badge">✦ Taller &amp; Registro · 1912</span>
+        <span class="brand-title">Cronos &amp; Co.</span>
+        <span class="brand-subtitle">Gestor de tareas y compromisos</span>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar-panel">
+          <span class="menu-toggle-bars" aria-hidden="true"></span>
+          <span class="menu-toggle-label">Menú</span>
+        </button>
+      </div>
+
+      <div class="sidebar-panel" id="sidebar-panel">
+        <nav class="sidebar-nav">
+          <span class="sidebar-heading">Cuaderno</span>
+          <a class="nav-link is-active" href="#panel"><span class="nav-glyph" aria-hidden="true">❦</span>Panel general</a>
+          <a class="nav-link" href="#tareas"><span class="nav-glyph" aria-hidden="true">✍&#xFE0E;</span>Tareas<span class="nav-count" id="nav-count-tasks">0</span></a>
+          <a class="nav-link" href="#compromisos"><span class="nav-glyph" aria-hidden="true">❖</span>Compromisos<span class="nav-count" id="nav-count-comm">0</span></a>
+          <a class="nav-link" href="#alta"><span class="nav-glyph" aria-hidden="true">✦</span>Nueva entrada</a>
+        </nav>
+
+        <section class="sidebar-ledger" aria-label="Resumen del registro">
+          <span class="sidebar-heading">Registro</span>
+          <dl class="ledger">
+            <div class="ledger-row"><dt>Tareas activas</dt><dd id="stat-active-tasks">0</dd></div>
+            <div class="ledger-row" id="ledger-overdue"><dt>Vencidas</dt><dd id="stat-overdue-tasks">0</dd></div>
+            <div class="ledger-row"><dt>Completadas</dt><dd id="stat-done-tasks">0</dd></div>
+            <div class="ledger-row"><dt>Compromisos vigentes</dt><dd id="stat-active-comm">0</dd></div>
+          </dl>
+        </section>
+
+        <div class="sidebar-foot">
+          <span class="sidebar-ornament" aria-hidden="true">❦</span>
+          <span>SDD v1.0 · Modelo en cascada</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ───────── Lienzo de trabajo ───────── -->
+    <main class="workspace" id="contenido">
+      <header class="page-header" id="panel">
+        <p class="page-eyebrow" id="today-label">Edición del día</p>
+        <h1 class="page-title">Cuaderno de Tareas &amp; Compromisos</h1>
+        <p class="page-subtitle">Registro riguroso de pendientes, plazos y encuentros acordados.</p>
+        <div class="ornament-rule" aria-hidden="true"><span>✦</span></div>
+      </header>
+
+      <div id="alert-zone" class="alert-zone"></div>
+
+      <div class="twin-columns">
+        <section class="column-section" id="tareas" aria-labelledby="heading-tasks">
+          <div class="section-header">
+            <h2 class="section-title" id="heading-tasks"><span class="section-glyph" aria-hidden="true">✍&#xFE0E;</span>Tareas</h2>
+            <span class="section-counter" id="counter-tasks">0 tareas</span>
+          </div>
+          <div class="filter-bar" role="group" aria-label="Filtrar tareas por estado" id="filter-task-status"></div>
+          <div class="filter-bar filter-bar-sub" role="group" aria-label="Filtrar tareas por prioridad" id="filter-task-priority"></div>
+          <div class="card-list" id="tasks-container" aria-live="polite"></div>
+        </section>
+
+        <section class="column-section" id="compromisos" aria-labelledby="heading-comm">
+          <div class="section-header">
+            <h2 class="section-title" id="heading-comm"><span class="section-glyph" aria-hidden="true">❖</span>Compromisos</h2>
+            <span class="section-counter" id="counter-comm">0 compromisos</span>
+          </div>
+          <div class="filter-bar" role="group" aria-label="Filtrar compromisos por estado" id="filter-comm-status"></div>
+          <div class="card-list" id="commitments-container" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <section class="official-form-section" id="alta" aria-labelledby="heading-form">
+        <div class="ornament-rule" aria-hidden="true"><span>❦</span></div>
+        <div class="form-section-head">
+          <h2 class="section-title" id="heading-form">Formulario Oficial de Alta</h2>
+          <p class="form-section-sub">Las reglas de negocio se validan mientras escribes.</p>
+        </div>
+        <div id="form-mount-point"></div>
+      </section>
+
+      <footer class="cronos-footer">
+        <div class="footer-ornament" aria-hidden="true">❦ &nbsp; ❖ &nbsp; ❦</div>
+        <p>Cronos &amp; Co. — Sistema de control de tareas y compromisos</p>
+        <p class="footer-meta">TypeScript estricto · Arquitectura por capas · Rigor cromático 60/40</p>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
